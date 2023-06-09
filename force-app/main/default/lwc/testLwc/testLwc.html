@@ -1,0 +1,133 @@
+<template>
+    <lightning-card title="Search Order Request to Approve(s)">
+      <div class="slds-grid slds-gutters">
+        <div class="slds-col">
+          <label class="slds-form-element__label" for="pickMonth">Pick Month</label>
+          <lightning-combobox
+            name="pickMonth"
+            value={searchPickMonth}
+            options={pickMonthOptions}
+            onchange={handlePickMonthChange}
+          ></lightning-combobox>
+        </div>
+        <div class="slds-col">
+          <label class="slds-form-element__label" for="pickStatus">Pick Status</label>
+          <lightning-combobox
+            name="pickStatus"
+            value={searchPickStatus}
+            options={pickStatusOptions}
+            onchange={handlePickStatusChange}
+          ></lightning-combobox>
+        </div>
+        <div class="slds-col">
+          <label class="slds-form-element__label" for="pickUser">Pick Approver User</label>
+          <lightning-combobox
+            name="pickUser"
+            value={searchPickUser}
+            options={pickUserOptions}
+            onchange={handlePickUserChange}
+          ></lightning-combobox>
+        </div>
+        <div class="slds-col">
+          <label class="slds-form-element__label" for="searchAltAccount">Search Alt Account#</label>
+          <lightning-input type="text" name="searchAltAccount" value={searchAltAccount} onchange={handleSearchAltAccountChange}></lightning-input>
+        </div>
+        <div class="slds-col">
+          <label class="slds-form-element__label" for="searchSKU">Search SKU#</label>
+          <lightning-input type="text" name="searchSKU" value={searchSKU} onchange={handleSearchSKUChange}></lightning-input>
+        </div>
+        <div class="slds-col">
+          <lightning-button label="Search" onclick={handleSearch}></lightning-button>
+        </div>
+      </div>
+  
+      <template if:true={wrapList}>
+        <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+          <thead>
+            <tr>
+              <th>Status/Risk/UPI/MRI<br/><span style="color:blue;">Account Name</span></th>
+              <th>Approver<br/><span style="color:blue;">Qty/UOM</span></th>
+              <th>SKU<br/><span style="color:blue;">Description</span></th>
+              <th>Order Number<br/><span style="color:blue;">PO Status</span></th>
+              <th>Arrivale<br/><span style="color:blue;">Order Date</span></th>
+              <th>Sugg.Qty<br/><span style="color:blue;">3 Month Avg</span></th>
+              <th>{forecastLabel}<br/><span style="color:blue;">{suggestForecastLabel}</span></th>
+              <th>On Hand<br/><span style="color:blue;">Reserved</span></th>
+              <th>In Transit<br/><span style="color:blue;">On Order</span></th>
+              <th>{SKUwidthlengthLabel}<br/><span style="color:blue;">Date Submitted</span></th>
+              <th>Order Link<br/><span style="color:blue;">Alt Account Number</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <template for:each={wrapList} for:item="wrap">
+              <tr key={wrap.Id}>
+                <td>
+                  <span>{wrap.Status}</span>
+                  <span style="color:green;">{wrap.RiskGo}</span>
+                  <span style="color:blue;">{wrap.RiskLow}</span>
+                  <span style="color:orange;">{wrap.RiskMed}</span>
+                  <span style="color:red;">{wrap.RiskHigh}</span>
+                  <span>{wrap.UPI}</span>
+                  <span>{wrap.MRI}</span>
+                  <br/><br/>
+                  <a href={wrap.AccountUrl} target="_self">{wrap.AccountName}</a>
+                </td>
+                <td>
+                  <span>{wrap.ApproverName}</span>
+                  <br/><br/>
+                  <span style="color:blue;">{wrap.OrderRequestQty}</span>
+                  <span>{wrap.UnitOfMeasure}</span>
+                </td>
+                <td>
+                  <span>{wrap.SKU}</span>
+                  <br/><br/>
+                  <span style="color:blue;">{wrap.SKUDesc}</span>
+                </td>
+                <td>
+                  <span>{wrap.OrderNumber}</span>
+                  <br/><br/>
+                  <span style="color:blue;">{wrap.PurchaseOrderStatus}</span>
+                </td>
+                <td>
+                  <span>{wrap.DesiredArrivalDate}</span>
+                  <br/><br/>
+                  <span style="color:blue;">{wrap.OrderDate}</span>
+                </td>
+                <td>
+                  <span>{wrap.SuggestedQty}</span>
+                  <br/><br/>
+                  <span style="color:blue;">{wrap.Month3Avg}</span>
+                </td>
+                <td>
+                  <span>{wrap.Forecasts}</span>
+                  <br/><br/>
+                  <span style="color:blue;">{wrap.Suggesteds}</span>
+                </td>
+                <td>
+                  <span>{wrap.OnHand}</span>
+                  <br/><br/>
+                  <span style="color:blue;">{wrap.Reserved}</span>
+                </td>
+                <td>
+                  <span>{wrap.InTransit}</span>
+                  <br/><br/>
+                  <span style="color:blue;">{wrap.OnOrder}</span>
+                </td>
+                <td>
+                  <span>{wrap.SKUWidthLength}</span>
+                  <br/><br/>
+                  <span style="color:blue;">{wrap.CreatedDate}</span>
+                </td>
+                <td>
+                  <a href={wrap.RecordUrl} target="_self">Link</a>
+                  <br/><br/>
+                  <span style="color:blue;">{wrap.AltAccountNumber}</span>
+                </td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </template>
+    </lightning-card>
+  </template>
+  
