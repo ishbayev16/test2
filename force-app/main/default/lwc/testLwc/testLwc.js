@@ -1,4 +1,4 @@
-import { LightningElement, track, wire } from 'lwc';
+import { LightningElement, track, wire, api } from 'lwc';
 
 import getOrderRequests from '@salesforce/apex/GetOrderRequestDataController.getOrderRequests'
 
@@ -6,7 +6,7 @@ export default class TestLwc extends LightningElement {
 
     //@wire(getOrderRequests) wiredoOrderRequests;
 
-    @track orderRequests;
+    @api _orderRequests = [];
      // Sample pickMonthOptions array
     pickMonthOptions = [
         { label: 'January', value: 'January' },
@@ -78,19 +78,19 @@ export default class TestLwc extends LightningElement {
   }
 
 
-  handleSearch() {
+  handleSearch= async() => {
     // Perform search logic here
 
     console.log('search cliecked');
     getOrderRequests()
     .then(result => {
-            this.orderRequests = result;
+          this._orderRequests = result;
     })
     .catch( error=>{
         this.orderRequests = null;
     });
 
-    console.log('fecthed results', this.orderRequests);
+    console.log('fecthed results', this._orderRequests);
 
   }
 
