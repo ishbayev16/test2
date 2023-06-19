@@ -1,0 +1,17 @@
+.custom-input{
+    margin-top: -15px;
+    margin-bottom: 15px;
+}
+.custom-search{
+    margin-top: 14px;
+}
+.table-container{
+    width: 100%;
+    overflow-x: auto;
+    padding: 0 10px;
+}
+
+.tableSubHeader{
+    margin-top: 15px;
+    color:blue;
+}

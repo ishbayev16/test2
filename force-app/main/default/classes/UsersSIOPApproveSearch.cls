@@ -21,7 +21,7 @@ allow search with date range system.today().addDays(-31) and with following AND 
 mz 9/30/2021 CO#273476   
 mz 11/15/2021 .setScale(0)  
 mz 1/20/2022 - CO299852 add final Approval   
-mz 4/1/2022 CO #315291    
+mz 4/1/2022 CO #315291    
 issue Incident #339816
 mz 4/22/2023 Point to Order group
 */
@@ -871,7 +871,8 @@ public with sharing class UsersSIOPApproveSearch {
           
           Integer totalCount =0;
         
-        
+          
+
           for (ProcessInstance pi: [SELECT Id, Status, TargetObjectId, TargetObject.Name, 
                                          (SELECT Id, ActorId, Actor.Name, OriginalActorId, OriginalActor.Name, StepStatus, Comments, ProcessNode.Name, CreatedDate 
                                             FROM StepsAndWorkitems 

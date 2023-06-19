@@ -1,60 +1,152 @@
 import { LightningElement, track, wire, api } from 'lwc';
+import getUsers from '@salesforce/apex/UsersSIOPApproveSearchNew.getUsers';
+import getWrapList from '@salesforce/apex/UsersSIOPApproveSearchNew.getWrapList';
 
-import getOrderRequests from '@salesforce/apex/GetOrderRequestDataController.getOrderRequests'
+const CHUNK_SIZE = 50;
 
 export default class TestLwc extends LightningElement {
 
-    //@wire(getOrderRequests) wiredoOrderRequests;
+    //@wire(getOrderRequests) wiredoOrderRequests;  
 
-    @api _orderRequests = [];
-     // Sample pickMonthOptions array
-    pickMonthOptions = [
-        { label: 'January', value: 'January' },
-        { label: 'February', value: 'February' },
-        { label: 'March', value: 'March' },
-        { label: 'April', value: 'April' },
-        { label: 'May', value: 'May' },
-        { label: 'June', value: 'June' },
-        { label: 'July', value: 'July' },
-        { label: 'August', value: 'August' },
-        { label: 'September', value: 'September' },
-        { label: 'October', value: 'October' },
-        { label: 'November', value: 'November' },
-        { label: 'December', value: 'December' }
-    ];
 
-        // Tracked properties
-    @track searchPickMonth = '';
+    // variables used in the controller logic
+    isCurrSalesConsoleApp;
+    SKUwidthlengthLabel;
+    pickMonthMap;
+    PickMonthLabel0;
+    PickMonthLabel1;
+    PickMonthLabel2;
+    PickMonthLabel3;
+    PickMonthLabel4;
+    PickMonthLabel5;
+    wrapList;
+    searchAltAccount;
+    searchSKU;
+    pickStatus;
+    searchPickStatus;
+    pickMonth;
+    searchPickMonth;
+    pickObject;
+    searchPickObject;
+    @track pickUser = [];
+    allpickUserLoaded;
+    totRecord;
+    sysEnv;
+    forecastApproveKey;
+    ordReqApproveKey;
+    ordReqApproveMMKey;
+    ordReqApproveMMOldKey;
+    ordReqApproveMMOld2Key;
+    SearchDate;
+
+    tempPickUser;
+    
+    @track SearchPickUser;
+
+    @track wrapList;
+
+
+    connectedCallback() {
+      //this.isCurrSalesConsoleApp = this.isSalesConsoleApp();
+
+      this.wrapList = [];
+
+      this.SKUwidthlengthLabel = 'SKU Width/Length';
+
+      this.pickMonthMap = {
+          1: 'January',
+          2: 'February',
+          3: 'March',
+          4: 'April',
+          5: 'May',
+          6: 'June',
+          7: 'July',
+          8: 'August',
+          9: 'September',
+          10: 'October',
+          11: 'November',
+          12: 'December'
+      };
+
+      this.PickMonthLabel0 = 'Current - ' + this.pickMonthMap[new Date().getMonth() + 1];
+      this.PickMonthLabel1 = new Date().getFullYear() + ' - ' + this.pickMonthMap[new Date().getMonth()];
+      this.PickMonthLabel2 = new Date().getFullYear() + ' - ' + this.pickMonthMap[new Date().getMonth() - 1];
+      this.PickMonthLabel3 = new Date().getFullYear() + ' - ' + this.pickMonthMap[new Date().getMonth() - 2];
+      this.PickMonthLabel4 = new Date().getFullYear() + ' - ' + this.pickMonthMap[new Date().getMonth() - 3];
+      this.PickMonthLabel5 = new Date().getFullYear() + ' - ' + this.pickMonthMap[new Date().getMonth() - 4];
+
+      //this.wrapList = this.getWrapList();
+
+      this.searchAltAccount = '';
+
+      this.searchSKU = '';
+
+      this.pickStatus = [
+          { label: 'Pending', value: 'Pending' },
+          { label: 'Approved', value: 'Approved' },
+          { label: 'Rejected', value: 'Rejected' },
+          { label: 'Recalled', value: 'Recalled' }
+      ];
+
+      this.searchPickStatus = 'Pending';
+
+      this.pickMonth = [
+          { label: this.PickMonthLabel0, value: '0' },
+          { label: this.PickMonthLabel1, value: '1' },
+          { label: this.PickMonthLabel2, value: '2' },
+          { label: this.PickMonthLabel3, value: '3' },
+          { label: this.PickMonthLabel4, value: '4' },
+          { label: this.PickMonthLabel5, value: '5' }
+      ];
+
+      this.searchPickMonth = '0';
+
+      this.pickObject = [{ label: 'Order Request', value: 'Order Request' }];
+
+      this.searchPickObject = 'Order Request';
+
+      //this.SearchPickUser = 'null';
+      this.allpickUserLoaded = false;
+      //his.pickUser = [{ label: 'null1', value: 'null' },{ label: 'null2', value: 'null2' }];
+
+      this.tempPickUser = [];
+      this.tempPickUser.push({label: '', value: ''});
+      this.pickUser = [];
+      //this.pickUser.push({label: '', value: 'null'});
+
+      getUsers()
+        .then( result =>{
+
+          for(let u of result){
+            console.log('u ', u);
+            this.tempPickUser.push({label: u.Name, value: u.Id});
+            //this.pickUser.push({label: u.Name, value: u.Id});
+            console.log('pickuserrrr', this.pickUser); 
+          }
+
+          this.pickUser = this.tempPickUser;
+          this.SearchPickUser = this.tempPickUser[0].value;
+          //this.SearchPickUser = this.pickUser[0].value;
+          //this.SearchPickUser = 'null';
+          this.allpickUserLoaded = result.length === 0;
+
+        }).catch(error =>{
+          console.log('Error user ', error )
+        })
+        
+       console.log('pickuser', this.pickUser); 
+
+  }
 
     // Event handler
     handlePickMonthChange(event) {
         this.searchPickMonth = event.target.value;
     }
 
-     // Constants
-  pickStatusOptions = [
-    { label: 'Option 1', value: 'Option 1' },
-    { label: 'Option 2', value: 'Option 2' },
-    { label: 'Option 3', value: 'Option 3' }
-  ];
-
-  // Tracked properties
-  @track searchPickStatus = '';
-
   // Event handler
   handlePickStatusChange(event) {
     this.searchPickStatus = event.target.value;
   }
-
-  // Constants
-  pickUserOptions = [
-    { label: 'User 1', value: 'User 1' },
-    { label: 'User 2', value: 'User 2' },
-    { label: 'User 3', value: 'User 3' }
-  ];
-
-  // Tracked properties
-  @track searchPickUser = '';
 
   // Event handler
   handlePickUserChange(event) {
@@ -79,26 +171,25 @@ export default class TestLwc extends LightningElement {
 
 
   handleSearch= async() => {
-    // Perform search logic here
+    console.log('pickuser', this.SearchPickUser, 'pickuser', this.pickUser , this.userOptions); 
 
-    console.log('search cliecked');
-    getOrderRequests()
-    .then(result => {
-          this._orderRequests = result;
-    })
-    .catch( error=>{
-        this.orderRequests = null;
-    });
-
-    console.log('fecthed results', this._orderRequests);
+    getWrapList()
+      .then(result =>{
+          console.log("wrp " , this.wrapList);
+          console.log("result wrap ", result);
+          this.wrapList = result;
+      })
+      .catch(error =>{
+        console.log("error get wraplist",error);
+      })
 
   }
 
-
+  /*
   wrapList = [
     {
       Status: 'Pending',
-      RiskGo: 'Low',
+      RiskGo: '',
       RiskLow: 'Medium',
       RiskMed: 'High',
       RiskHigh: 'Critical',
@@ -161,6 +252,7 @@ export default class TestLwc extends LightningElement {
       AltAccountNumber: 'ALT002'
     }
   ];
+  */
 
 
 }
