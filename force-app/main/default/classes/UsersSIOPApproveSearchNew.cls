@@ -238,7 +238,9 @@ public with sharing class UsersSIOPApproveSearchNew {
      static Map<String,String> checkMap = new Map<String,String>();    
     
     @AuraEnabled
-    public static List<wrapperclass> getWrapList() {
+    public static List<wrapperclass> getWrapList(String searchAltAccount, String searchSKU, 
+               String searchPickUser, String searchPickUser, String ordReqApproveKey, 
+               String ordReqApproveMMKey, ) {
          Date startDate;
          Date endDate;
          
@@ -1173,6 +1175,17 @@ public with sharing class UsersSIOPApproveSearchNew {
            ORDER BY Name
        ];
    }
+
+
+   @AuraEnabled(cacheable=true)
+   public static Gbl_Utl_Lkup__c getGbl_Utl_Lkup() {
+       return [
+         Select By_Environment__c, report_link__c, report_link2__c,report_link3__c,
+               report_link4__c,report_link5__c from Gbl_Utl_Lkup__c 
+               where apex_name__c ='UsersSIOPApproveSearch' and Email_Flag__c ='Y' limit 1
+       ];
+   }
+
  
  
    }

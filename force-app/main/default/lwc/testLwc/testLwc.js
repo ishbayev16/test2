@@ -1,5 +1,6 @@
 import { LightningElement, track, wire, api } from 'lwc';
 import getUsers from '@salesforce/apex/UsersSIOPApproveSearchNew.getUsers';
+import getGbl_Utl_Lkup from '@salesforce/apex/UsersSIOPApproveSearchNew.getGbl_Utl_Lkup';
 import getWrapList from '@salesforce/apex/UsersSIOPApproveSearchNew.getWrapList';
 
 const CHUNK_SIZE = 50;
@@ -131,12 +132,42 @@ export default class TestLwc extends LightningElement {
           this.allpickUserLoaded = result.length === 0;
 
         }).catch(error =>{
-          console.log('Error user ', error )
+          console.log('Error user ', error );
         })
         
        console.log('pickuser', this.pickUser); 
 
+
+       getGbl_Utl_Lkup()
+          .then( result =>{
+
+              console.log('resultt ',result);
+
+              if (result.By_Environment__c!= null)
+                this.sysEnv =result.By_Environment__c;    
+              if (result.Report_Link__c!= null)
+                this.forecastApproveKey = result.report_link__c;
+                
+              if (result.Report_Link2__c!= null)
+                this.ordReqApproveKey = result.Report_Link2__c;
+                
+              if (result.Report_Link3__c!= null)
+                this.ordReqApproveMMKey = result.Report_Link3__c;  
+              
+              if (result.Report_Link4__c!= null)
+                this.ordReqApproveMMOldKey = result.Report_Link4__c;  
+                
+              if (result.Report_Link5__c!= null)
+                this.ordReqApproveMMOld2Key = result.Report_Link5__c; 
+
+          })
+          .catch(error =>{
+            console.log('Error user ', error );
+          })
+   
   }
+
+  
 
     // Event handler
     handlePickMonthChange(event) {
