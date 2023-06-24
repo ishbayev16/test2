@@ -3,6 +3,7 @@ import getUsers from '@salesforce/apex/UsersSIOPApproveSearchNew.getUsers';
 import getGbl_Utl_Lkup from '@salesforce/apex/UsersSIOPApproveSearchNew.getGbl_Utl_Lkup';
 import getWrapList from '@salesforce/apex/UsersSIOPApproveSearchNew.getWrapList';
 
+
 const CHUNK_SIZE = 50;
 
 export default class TestLwc extends LightningElement {
@@ -21,7 +22,7 @@ export default class TestLwc extends LightningElement {
     PickMonthLabel4;
     PickMonthLabel5;
     wrapList;
-    searchAltAccount;
+    @track searchAltAccount;
     searchSKU;
     pickStatus;
     searchPickStatus;
@@ -204,15 +205,27 @@ export default class TestLwc extends LightningElement {
   handleSearch= async() => {
     console.log('pickuser', this.SearchPickUser, 'pickuser', this.pickUser , this.userOptions); 
 
-    getWrapList()
+
+    console.log('res',this.searchAltAccount, 'res2', this.searchSKU, 'res3', this.searchPickUser, 'res4',
+    this.ordReqApproveKey, 'res5',this.ordReqApproveMMKey, 'res6',this.searchPickStatus);
+
+   
+  
+
+    getWrapList({searchAltAccount: this.searchAltAccount, searchSKU: this.searchSKU, searchPickUser: this.searchPickUser , 
+      ordReqApproveKey: this.ordReqApproveKey , ordReqApproveMMKey: this.ordReqApproveMMKey , searchPickStatus: this.searchPickStatus,
+      searchPickMonth: this.searchPickMonth
+    })
       .then(result =>{
+
           console.log("wrp " , this.wrapList);
           console.log("result wrap ", result);
           this.wrapList = result;
       })
       .catch(error =>{
-        console.log("error get wraplist",error);
+        console.log("error2 get wraplist",error);
       })
+       
 
   }
 

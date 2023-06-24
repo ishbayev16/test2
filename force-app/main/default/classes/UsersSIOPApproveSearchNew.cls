@@ -33,7 +33,7 @@ public with sharing class UsersSIOPApproveSearchNew {
             
           PageReference  redirecturl = new PageReference('/apex/UsersSIOPApproveSearchPage');
           
-          WrapList = getWrapList();
+          //WrapList = getWrapList();
           
           return redirecturl;
           
@@ -237,10 +237,11 @@ public with sharing class UsersSIOPApproveSearchNew {
      static Map<String,String> userMap = new Map<String,String>();     
      static Map<String,String> checkMap = new Map<String,String>();    
     
+
     @AuraEnabled
     public static List<wrapperclass> getWrapList(String searchAltAccount, String searchSKU, 
-               String searchPickUser, String searchPickUser, String ordReqApproveKey, 
-               String ordReqApproveMMKey, ) {
+               String searchPickUser, String ordReqApproveKey, 
+               String ordReqApproveMMKey, String searchPickStatus, String searchPickMonth ) {
          Date startDate;
          Date endDate;
          
@@ -284,7 +285,11 @@ public with sharing class UsersSIOPApproveSearchNew {
             SuggestForecastLabel = 'Sugg:'+suggestMonthsMap.get(System.today().addMonths(-5).month()); 
        } 
         
-        
+       system.debug('searchPickMonth '+searchPickMonth);
+       system.debug('startDate '+ startDate);
+       system.debug('endDate '+ endDate);
+       system.debug('ForecastLabel '+ ForecastLabel);
+       system.debug('SuggestForecastLabel '+ SuggestForecastLabel);
          
          wrapList = new List<wrapperclass>();
           
@@ -1073,6 +1078,8 @@ public with sharing class UsersSIOPApproveSearchNew {
        return wrapList;
    } //end getWrapList
  
+
+
    public class wrapperClass{
        @AuraEnabled public Boolean selected{get;set;}
        @AuraEnabled public String Status {get; set;}
