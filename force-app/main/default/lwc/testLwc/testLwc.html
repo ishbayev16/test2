@@ -56,7 +56,7 @@
                 <th>Order Number<br/><div class="tableSubHeader">PO Status</div></th>
                 <th>Arrivale<br/><div class="tableSubHeader">Order Date</div></th>
                 <th>Sugg.Qty<br/><div class="tableSubHeader">3 Month Avg</div></th>
-                <th>{forecastLabel}<br/><div class="tableSubHeader">{suggestForecastLabel}</div></th>
+                <th>{ForecastLabel}<br/><div class="tableSubHeader">{SuggestForecastLabel}</div></th>
                 <th>On Hand<br/><div class="tableSubHeader">Reserved</div></th>
                 <th>In Transit<br/><div class="tableSubHeader">On Order</div></th>
                 <th>{SKUwidthlengthLabel}<br/><div class="tableSubHeader">Date Submitted</div></th>
@@ -74,8 +74,8 @@
                     <span style="color:red;">{wrap.RiskHigh}</span>
                     <span>{wrap.UPI}</span>
                     <span>{wrap.MRI}</span>
-                    <br/><br/>
-                    <a href={wrap.AccountUrl} target="_self">{wrap.AccountName}</a>
+                    <br/>
+                    <a href=# target="_self" onclick={handleLinkClick} data-account-id={wrap.AccountId}>{wrap.AccountName}</a>
                   </td>
                   <td>
                     <span>{wrap.ApproverName}</span>
@@ -124,12 +124,29 @@
                     <span style="color:blue;">{wrap.CreatedDate}</span>
                   </td>
                   <td>
-                    <a href={wrap.RecordUrl} target="_self">Link</a>
+                    <a href=# target="_self" onclick={handleLinkClick} data-account-id={wrap.AccountId}>Link</a>
                     <br/><br/>
                     <span style="color:blue;">{wrap.AltAccountNumber}</span>
                   </td>
                 </tr>
+              </template >
+              <template if:false={totRecord}>
+                <template if:false={isloading}>
+                  <tr>
+                    <td colspan="11">
+                      <div style="text-align: center;" class="full-width">No data available in table</div>
+                    </td>
+                  </tr>
+                </template>
               </template>
+              <template if:true={isloading}>
+                <tr>
+                  <td colspan="11">
+                    <div style="text-align: center;" class="full-width">Loading...</div>
+                  </td>
+                </tr>
+              </template>
+
             </tbody>
           </table>
         </div>

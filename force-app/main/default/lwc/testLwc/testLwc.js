@@ -2,11 +2,11 @@ import { LightningElement, track, wire, api } from 'lwc';
 import getUsers from '@salesforce/apex/UsersSIOPApproveSearchNew.getUsers';
 import getGbl_Utl_Lkup from '@salesforce/apex/UsersSIOPApproveSearchNew.getGbl_Utl_Lkup';
 import getWrapList from '@salesforce/apex/UsersSIOPApproveSearchNew.getWrapList';
-
+import {NavigationMixin} from 'lightning/navigation';
 
 const CHUNK_SIZE = 50;
 
-export default class TestLwc extends LightningElement {
+export default class TestLwc extends NavigationMixin(LightningElement) {
 
     //@wire(getOrderRequests) wiredoOrderRequests;  
 
@@ -32,7 +32,7 @@ export default class TestLwc extends LightningElement {
     searchPickObject;
     @track pickUser = [];
     allpickUserLoaded;
-    totRecord;
+    @track totRecord;
     sysEnv;
     forecastApproveKey;
     ordReqApproveKey;
@@ -40,15 +40,22 @@ export default class TestLwc extends LightningElement {
     ordReqApproveMMOldKey;
     ordReqApproveMMOld2Key;
     SearchDate;
+    SearchTotal;
 
+    @track ForecastLabel;
+    @track SuggestForecastLabel;
+    
     tempPickUser;
     
     @track SearchPickUser;
 
     @track wrapList;
 
+    @track isloading; 
 
-    connectedCallback() {
+
+
+    async connectedCallback() {
       //this.isCurrSalesConsoleApp = this.isSalesConsoleApp();
 
       this.wrapList = [];
@@ -116,14 +123,15 @@ export default class TestLwc extends LightningElement {
       this.pickUser = [];
       //this.pickUser.push({label: '', value: 'null'});
 
-      getUsers()
+      this.isloading = true;
+     await getUsers()
         .then( result =>{
 
           for(let u of result){
-            console.log('u ', u);
+           
             this.tempPickUser.push({label: u.Name, value: u.Id});
             //this.pickUser.push({label: u.Name, value: u.Id});
-            console.log('pickuserrrr', this.pickUser); 
+            
           }
 
           this.pickUser = this.tempPickUser;
@@ -139,7 +147,7 @@ export default class TestLwc extends LightningElement {
        console.log('pickuser', this.pickUser); 
 
 
-       getGbl_Utl_Lkup()
+      await getGbl_Utl_Lkup()
           .then( result =>{
 
               console.log('resultt ',result);
@@ -165,6 +173,25 @@ export default class TestLwc extends LightningElement {
           .catch(error =>{
             console.log('Error user ', error );
           })
+
+         await getWrapList({searchAltAccount: this.searchAltAccount, searchSKU: this.searchSKU, searchPickUser: this.searchPickUser , 
+            ordReqApproveKey: this.ordReqApproveKey , ordReqApproveMMKey: this.ordReqApproveMMKey , searchPickStatus: this.searchPickStatus,
+            searchPickMonth: this.searchPickMonth
+          })
+            .then(result =>{
+      
+                console.log("wrp " , this.wrapList);
+                console.log("result wrap ", result);
+                this.wrapList = result.wrapList;
+                this.ForecastLabel = result.ForecastLabel;
+                this.SuggestForecastLabel = result.SuggestForecastLabel;
+                this.totRecord = this.wrapList.length;
+            })
+            .catch(error =>{
+              console.log("error2 get wraplist",error);
+            })
+
+            this.isloading = false;
    
   }
 
@@ -203,16 +230,11 @@ export default class TestLwc extends LightningElement {
 
 
   handleSearch= async() => {
-    console.log('pickuser', this.SearchPickUser, 'pickuser', this.pickUser , this.userOptions); 
 
-
-    console.log('res',this.searchAltAccount, 'res2', this.searchSKU, 'res3', this.searchPickUser, 'res4',
-    this.ordReqApproveKey, 'res5',this.ordReqApproveMMKey, 'res6',this.searchPickStatus);
-
-   
-  
-
-    getWrapList({searchAltAccount: this.searchAltAccount, searchSKU: this.searchSKU, searchPickUser: this.searchPickUser , 
+    this.isloading = true;
+    this.wrapList = [];
+    
+   await getWrapList({searchAltAccount: this.searchAltAccount, searchSKU: this.searchSKU, searchPickUser: this.searchPickUser , 
       ordReqApproveKey: this.ordReqApproveKey , ordReqApproveMMKey: this.ordReqApproveMMKey , searchPickStatus: this.searchPickStatus,
       searchPickMonth: this.searchPickMonth
     })
@@ -220,12 +242,36 @@ export default class TestLwc extends LightningElement {
 
           console.log("wrp " , this.wrapList);
           console.log("result wrap ", result);
-          this.wrapList = result;
+          this.wrapList = result.wrapList;
+          this.ForecastLabel = result.ForecastLabel;
+          this.SuggestForecastLabel = result.SuggestForecastLabel;
+          this.totRecord = this.wrapList.length;
       })
       .catch(error =>{
         console.log("error2 get wraplist",error);
       })
-       
+      
+      this.isloading = false;
+
+
+  }
+
+  handleLinkClick = (event) => {
+
+    event.preventDefault();
+
+    const accountId = event.target.dataset.accountId;
+
+    console.log('target', accountId , event.target.value);
+
+    this[NavigationMixin.Navigate]({
+      type: 'standard__recordPage',
+      attributes: {
+        recordId: accountId,
+        objectApiName: 'Account',
+        actionName: 'view'
+      }
+    })
 
   }
 

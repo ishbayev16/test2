@@ -1,237 +1,28 @@
-/* mz 7/3/2020 CO193841
-* Search return 100
-allow search with date range system.today().addDays(-31) and with following AND search fields
-            //1 searchPickUser/SearchPickStatus/searchAltAccount/searchSKU
-            //2 searchPickUser/SearchPickStatus/searchAltAccount
-            //3 searchPickUser/SearchPickStatus/searchSKU
-            //4 searchPickUser/searchAltAccount/searchSKU
-            //5 SearchPickStatus/searchAltAccount/searchSKU
-            //6 searchPickUser/SearchPickStatus
-            //7 SearchPickStatus/searchAltAccount
-            //8 SearchPickStatus/searchSKU
-            //9 searchPickUsers/SearchAltAccount
-            //10 searchPickUser/searchSKU
-            //11 searchAltAccount/searchSKU
-            //12 searchPickUser
-            //13 SearchPickStatus
-            //14 searchAltAccount
-            //15 searchSKU
-            //16 all blank
-            
-mz 9/30/2021 CO#273476   
-mz 11/15/2021 .setScale(0)  
-mz 1/20/2022 - CO299852 add final Approval   
-mz 4/1/2022 CO #315291    
-issue Incident #339816
-mz 4/22/2023 Point to Order group
-*/
 public with sharing class UsersSIOPApproveSearchNew {
-    private ApexPages.StandardController stdCtrl{get; set;}
-    static Integer totRecord {get;set;}
-    
-    public PageReference runSearch() {   
-            
-          PageReference  redirecturl = new PageReference('/apex/UsersSIOPApproveSearchPage');
-          
-          //WrapList = getWrapList();
-          
-          return redirecturl;
-          
-          
-     }
-     
-    static Boolean isCurrSalesConsoleApp {get;set;} 
-    public Boolean isSalesConsoleApp() {
-         String appName = 'Sales Console';
- 
-         // Get tab set describes for each app
-         List<Schema.DescribeTabSetResult> tabSetDesc = Schema.describeTabs();
-         // Iterate through each tab set describe for each app and display the info
-         boolean selected = false;
-         for(Schema.DescribeTabSetResult tsr : tabSetDesc) {
-             if (tsr.getLabel() == appName) {
-                 selected = tsr.isSelected();
-                 break;   
-             }           
-         }       
- 
-         // Selected?
-         return selected ? true : false;
-    } 
-   
-    /**
-    public UsersSIOPApproveSearchNew (ApexPages.StandardController controller) {
-    
-         isCurrSalesConsoleApp = isSalesConsoleApp();
-                 
-         SKUwidthlengthLabel ='SKU Width/Length'; 
-         
-         Map<Integer,String> pickMonthMap = new Map<Integer,String>{1 => 'January', 2 => 'February', 3 => 'March',4 => 'April',5 => 'May',6 => 'June',7 => 'July',8 => 'August',9 => 'September',10 => 'October',11 => 'November',12 => 'December'};  
-         
-         PickMonthLabel0 ='Current - '+pickMonthMap.get(System.today().month());
-         PickMonthLabel1  =(date.today().addmonths(-1)).Year() +' - ' + pickMonthMap.get((date.today().addmonths(-1)).month());
-         PickMonthLabel2  =(date.today().addmonths(-2)).Year() +' - ' +pickMonthMap.get((date.today().addmonths(-2)).month());
-         PickMonthLabel3 = (date.today().addmonths(-3)).Year() +' - ' +pickMonthMap.get((date.today().addmonths(-3)).month());
-         PickMonthLabel4  =(date.today().addmonths(-4)).Year() +' - ' +pickMonthMap.get((date.today().addmonths(-4)).month());
-         PickMonthLabel5 = (date.today().addmonths(-5)).Year() +' - ' +pickMonthMap.get((date.today().addmonths(-5)).month());
-    
-         wrapList = getWrapList();
-     
-         //search altAccount
-         searchAltAccount ='';
-          
-         //search SKU
-         searchSKU ='';
-         
-         //pick Approve status
-         pickStatus = new List<SelectOption>();
-              
-         //default Pending
-         searchPickStatus ='Pending';
-         ////pickStatus.add(new SelectOption('',''));
-         pickStatus.add(new SelectOption('Pending','Pending'));
-         pickStatus.add(new SelectOption('Approved','Approved'));
-         pickStatus.add(new SelectOption('Rejected','Rejected'));
-         pickStatus.add(new SelectOption('Recalled','Recalled'));
-      
-      
-         //pick Month
-         pickMonth = new List<SelectOption>();
-              
-         //default Current 
-         searchPickMonth ='0';
-         pickMonth.add(new SelectOption('0',PickMonthLabel0 ));
-         pickMonth.add(new SelectOption('1',PickMonthLabel1));
-         pickMonth.add(new SelectOption('2',PickMonthLabel2 ));
-         pickMonth.add(new SelectOption('3',PickMonthLabel3));
-         pickMonth.add(new SelectOption('4',PickMonthLabel4));
-         pickMonth.add(new SelectOption('5',PickMonthLabel5));
-         //pick Object
-         pickObject = new List<SelectOption>();
-              
-         //default Forecast
-         searchPickObject ='Order Request';
-         pickObject.add(new SelectOption('Order Request','Order Request'));
-         
-         
-         //pickUser
-         pickUser =new List<SelectOption>();
-         pickUser.add(new SelectOption('',''));
-           
-         for(user u: [select id, name from User where IsActive = true and Region__c != 'Ryerson China' and (User_Type__c ='ISM' or User_Type__c ='OSM' or User_Type__c ='GM' or User_Type__c ='RPM' or User_Type__c ='EMP'or User_Type__c ='EXM' or User_Type__c ='PDM') order by name]) {
-           pickUser.add(new SelectOption(u.id,u.name));
-         }
-       
-         
-         totRecord =wrapList.size();
-          
-         if (searchPickStatus == null && searchPickStatus =='')
-           searchPickStatus='Pending';
-         
-         //get approve seting key
-         Gbl_Utl_Lkup__c[] sysEnvList =[select By_Environment__c, report_link__c, report_link2__c,report_link3__c,report_link4__c,report_link5__c from Gbl_Utl_Lkup__c where apex_name__c ='UsersSIOPApproveSearch' and Email_Flag__c ='Y' limit 1 ];
-         for(Gbl_Utl_Lkup__c aEnv:sysEnvList ){   
-           if (aEnv.By_Environment__c!= null)
-             sysEnv =aEnv.By_Environment__c;    
-            if (aEnv.Report_Link__c!= null)
-              forecastApproveKey = aEnv.report_link__c;
-              
-            if (aEnv.Report_Link2__c!= null)
-              ordReqApproveKey = aEnv.Report_Link2__c;
-              
-            if (aEnv.Report_Link3__c!= null)
-              ordReqApproveMMKey = aEnv.Report_Link3__c;  
-            
-            if (aEnv.Report_Link4__c!= null)
-              ordReqApproveMMOldKey = aEnv.Report_Link4__c;  
-              
-            if (aEnv.Report_Link5__c!= null)
-              ordReqApproveMMOld2Key = aEnv.Report_Link5__c;      
- 
-         }    
-         
-         SearchDate = system.today().addDays(-90);
-    
-         runSearch();
- 
-    }
-     */
+
  
      static List<wrapperclass> wrapList = new List<wrapperclass>();
+     static returnResult ReturnResult = new ReturnResult();
+        
     
-    static String ActionComments{get;set;}
-    
-    static String searchPickStatus {get;set;}
-    
-     static String searchPickMonth {get;set;}
     
     
     static String searchOrdReqStatus {get;set;}
     
     static String searchPickObject {get;set;}
-    static String searchAltAccount {get;set;}
-    static String searchSKU {get;set;}
-    static String forecastApproveKey {get;set;}
-    static String ordReqApproveKey {get;set;}
-    static String ordReqApproveMMKey {get;set;}
-    static String ordReqApproveMMOldKey {get;set;}
-    static String ordReqApproveMMOld2Key {get;set;}
+       
     
-    
-    static String sysEnv{get;set;}
-    static Date searchDate{get;set;}
     static String SearchTotal {get;set;}
     
     
-    static List<SelectOption> pickObject {
-      get {
-          return pickObject;
-      }
-     set;
-    }
-    
-    static List<SelectOption> pickStatus {
-      get {
-          return pickStatus;
-      }
-     set;
-    }
     
     
-    static List<SelectOption> pickMonth {
-      get {
-          return pickMonth;
-      }
-     set;
-    }
-    static String searchPickUser {get;set;}
-    
-    static List<SelectOption> pickUser {
-      get {
-          return pickUser;
-      }
-     set;
-    }
-    
-    
-    
-    static String addMsg{get;set;}
-    
-    static boolean hasMsg{get;set;}
     
      static String ForecastLabel {get;set;}
     
-     static String PickMonthLabel0 {get;set;}
-     static String PickMonthLabel1 {get;set;}
-     static String PickMonthLabel2 {get;set;}
-     static String PickMonthLabel3 {get;set;}
-     static String PickMonthLabel4 {get;set;}
-     static String PickMonthLabel5 {get;set;}
     
      static String SuggestForecastLabel {get;set;}
-     static String SKUwidthlengthLabel {get;set;}
-     static String ApproverLabel {get;set;}
-    
+   
     
     
      static Map<String,String> userMap = new Map<String,String>();     
@@ -239,11 +30,13 @@ public with sharing class UsersSIOPApproveSearchNew {
     
 
     @AuraEnabled
-    public static List<wrapperclass> getWrapList(String searchAltAccount, String searchSKU, 
+    public static ReturnResult getWrapList(String searchAltAccount, String searchSKU, 
                String searchPickUser, String ordReqApproveKey, 
                String ordReqApproveMMKey, String searchPickStatus, String searchPickMonth ) {
          Date startDate;
          Date endDate;
+
+         system.debug('getWraplist run');
          
          Map<Integer,String> forecastMonthsMap = new Map<Integer,String>{1 => 'Jan/Fab/Mar/Apr', 2 => 'Fab/Mar/Apr/May', 3 => 'Mar/Apr/May/Jun',4 => 'Apr/May/Jun/Jul',5 => 'May/Jun/Jul/Aug',6 => 'Jun/Jul/Aug/Sep',7 => 'Jul/Aug/Sep/Oct',8 => 'Aug/Sep/Oct/Nov',9 => 'Sep/Oct/Nov/Dec',10 => 'Oct/Nov/Dec/Jan',11 => 'Nov/Dec/Jan/Feb',12 => 'Dec/Jan/Feb/Mar'};  
          Map<Integer,String> suggestMonthsMap = new Map<Integer,String>{1 => 'Fab/Mar/Apr', 2 => 'Mar/Apr/May', 3 => 'Apr/May/Jun',4 => 'May/Jun/Jul',5 => 'Jun/Jul/Aug',6 => 'Jul/Aug/Sep',7 => 'Aug/Sep/Oct',8 => 'Sep/Oct/Nov',9 => 'Oct/Nov/Dec',10 => 'Nov/Dec/Jan',11 => 'Dec/Jan/Feb',12 => 'Jan/Feb/Mar'};  
@@ -1075,10 +868,20 @@ public with sharing class UsersSIOPApproveSearchNew {
        else
                SearchTotal= 'Total Search results:'+string.valueof(wrapList.size()); 
                     
-       return wrapList;
+       //return wrapList;
+      
+       ReturnResult.wrapList = wrapList;
+       ReturnResult.ForecastLabel = ForecastLabel;
+       ReturnResult.SuggestForecastLabel = SuggestForecastLabel;
+       return ReturnResult;
    } //end getWrapList
  
 
+   public class returnResult{
+      @AuraEnabled public List<wrapperclass> wrapList{get;set;}
+      @AuraEnabled public String ForecastLabel{get;set;}
+      @AuraEnabled public String SuggestForecastLabel{get;set;}
+   }
 
    public class wrapperClass{
        @AuraEnabled public Boolean selected{get;set;}
@@ -1158,7 +961,7 @@ public with sharing class UsersSIOPApproveSearchNew {
  
  
  
-    static String getSearchOrdReqStatus(String SearchPickStatus){
+    public static String getSearchOrdReqStatus(String SearchPickStatus){
        if (SearchPickStatus =='Approved') 
           return 'Sent to ERP';
        else if (SearchPickStatus =='Pending')
