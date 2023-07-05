@@ -275,6 +275,23 @@ export default class TestLwc extends NavigationMixin(LightningElement) {
 
   }
 
+  handleLinkClick2 = (event) => {
+
+    event.preventDefault();
+
+    const orderRequestId = event.target.dataset.recordId;
+
+    this[NavigationMixin.Navigate]({
+      type: 'standard__recordPage',
+      attributes: {
+        recordId: orderRequestId,
+        objectApiName: 'Order_Request__c',
+        actionName: 'view'
+      }
+    })
+
+  }
+
   /*
   wrapList = [
     {

@@ -565,10 +565,9 @@ public with sharing class UsersSIOPApproveSearchNew {
                                                where SIOP_2_Forecast__r.Is_DW__c = TRUE and Order_Submission_Group__c != null
                                                  and status__c =:searchOrdReqStatus
                                                 ]){ 
-                                             
                         ordReqFieldsMap.put(ordReqRecord.id,ordReqRecord);
-               
-                       system.debug('mzcheck case 13 searchOrdReqStatus ='+searchOrdReqStatus );
+
+                       system.debug('mzcheck case 13 searchOrdReqStatus ='+searchOrdReqStatus );  
                 
                        if(ordIdAndRequestMap.containsKey(ordReqRecord.Order_Submission_Group__c)) {
                           List<Order_Request__c> ordList = ordIdAndRequestMap.get(ordReqRecord.Order_Submission_Group__c);
@@ -697,7 +696,7 @@ public with sharing class UsersSIOPApproveSearchNew {
                      } // end of if(ordIdAndRequestMap
              
                      wrapperClass pendingApprovalWrap = new wrapperClass();
-                        
+
                      pendingApprovalWrap.selected=false;
                      pendingApprovalWrap.Status = pi.Status;
                        
@@ -710,6 +709,7 @@ public with sharing class UsersSIOPApproveSearchNew {
                      pendingApprovalWrap.ApproverId = searchPickUser;
                         
                      pendingApprovalWrap.id =pih.id;
+                     
                         
                      if (ordIdAndRequestMap.get(pendingApprovalWrap.RecordId)!= null) {
                           //order req get from Date_of_Submittal__c
@@ -720,7 +720,7 @@ public with sharing class UsersSIOPApproveSearchNew {
                           
                           pendingApprovalWrap.AccountId=ordIdAndRequestMap.get(pendingApprovalWrap.RecordId)[0].SIOP_2_Forecast__r.Account__c;
                           pendingApprovalWrap.AccountName=ordIdAndRequestMap.get(pendingApprovalWrap.RecordId)[0].Account_Name__c;
-                          
+                          pendingApprovalWrap.orderReqId = ordIdAndRequestMap.get(pendingApprovalWrap.RecordId)[0].id;
                           
                           pendingApprovalWrap.AltAccountNumber =ordIdAndRequestMap.get(pendingApprovalWrap.RecordId)[0].Alt_Account_Number__c;
                          
@@ -925,7 +925,8 @@ public with sharing class UsersSIOPApproveSearchNew {
          
        @AuraEnabled public String SKUWidth{get;set;}
        @AuraEnabled public String SKULength{get;set;}
-           
+       
+       @AuraEnabled public String orderReqId {get;set;}
        @AuraEnabled public String id {get;set;}
        @AuraEnabled public String Reassign {get;set;}
        @AuraEnabled public String ApproveReject {get;set;}
