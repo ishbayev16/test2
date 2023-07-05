@@ -40,7 +40,7 @@ export default class TestLwc extends NavigationMixin(LightningElement) {
     ordReqApproveMMOldKey;
     ordReqApproveMMOld2Key;
     SearchDate;
-    SearchTotal;
+    @track SearchTotal;
 
     @track ForecastLabel;
     @track SuggestForecastLabel;
@@ -58,6 +58,8 @@ export default class TestLwc extends NavigationMixin(LightningElement) {
     async connectedCallback() {
       //this.isCurrSalesConsoleApp = this.isSalesConsoleApp();
 
+      this.SearchTotal = '';
+      
       this.wrapList = [];
 
       this.SKUwidthlengthLabel = 'SKU Width/Length';
@@ -186,6 +188,16 @@ export default class TestLwc extends NavigationMixin(LightningElement) {
                 this.ForecastLabel = result.ForecastLabel;
                 this.SuggestForecastLabel = result.SuggestForecastLabel;
                 this.totRecord = this.wrapList.length;
+
+                if(result.wrapList.length >= 100){
+                  this.SearchTotal='Max return search is 100, please narrow down your search!';
+                }   
+                else{
+                  this.SearchTotal= 'Total Search results: '+ result.wrapList.length; 
+                }
+
+                console.log("SearchTotal " , this.SearchTotal);
+                    
             })
             .catch(error =>{
               console.log("error2 get wraplist",error);
@@ -246,6 +258,14 @@ export default class TestLwc extends NavigationMixin(LightningElement) {
           this.ForecastLabel = result.ForecastLabel;
           this.SuggestForecastLabel = result.SuggestForecastLabel;
           this.totRecord = this.wrapList.length;
+          if(result.wrapList.length >= 100){
+            this.SearchTotal='Max return search is 100, please narrow down your search!';
+          }   
+          else{
+            this.SearchTotal= 'Total Search results: '+result.wrapList.length; 
+          }
+
+          console.log("SearchTotal " , this.SearchTotal);
       })
       .catch(error =>{
         console.log("error2 get wraplist",error);

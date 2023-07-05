@@ -863,10 +863,7 @@ public with sharing class UsersSIOPApproveSearchNew {
            } // end of for (ProcessInstance pi          
        } // end of search cases
          
-       if(wrapList.size()==100)
-               SearchTotal='Max return search is 100, please narrow down your search!';
-       else
-               SearchTotal= 'Total Search results:'+string.valueof(wrapList.size()); 
+       
                     
        //return wrapList;
       
